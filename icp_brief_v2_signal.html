@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal vs Noise — ICP Brief v2</title>
+<style>
+  :root{
+    --bg:#0E0E0C; --surface:#1A1815; --surface2:#211E19; --border:#2A2620;
+    --cream:#E8C88C; --terra:#C97B4A; --green:#6FA86F; --amber:#D4A24A; --red:#B85C5C; --tech:#7C93A6;
+    --text:#F5E6CC; --muted:#9b9485;
+    --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:44px 30px 90px;}
+  header h1{font-size:30px;letter-spacing:-0.015em;margin:0 0 6px;font-weight:600;}
+  header h1 .hl{color:var(--cream);}
+  header .sub{color:var(--muted);font-size:13.5px;margin:0;max-width:860px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+  .chip{font-size:11px;font-family:var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:5px 12px;}
+  .chip b{color:var(--cream);}
+
+  h2.sec{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:50px 0 14px;}
+  .sec-lede{font-size:14.5px;margin:-6px 0 18px;max-width:880px;}
+  .sec-lede b{color:var(--cream);}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;}
+  .correction{border-left:4px solid var(--red);}
+  .correction p{font-size:15px;margin:0 0 10px;}
+  .correction p:last-child{margin:0;}
+  .correction b{color:var(--cream);}
+
+  /* signal vs noise table */
+  .svn{width:100%;border-collapse:collapse;font-size:13px;}
+  .svn th{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;padding:11px 14px;border-bottom:1px solid var(--border);text-align:left;}
+  .svn th.sig{color:var(--green);} .svn th.noi{color:var(--red);}
+  .svn td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;width:50%;}
+  .svn td.sig{border-left:3px solid var(--green);} .svn td.noi{border-left:3px solid var(--red);}
+  .svn tr:hover td{background:var(--surface2);}
+
+  /* avatar contrast */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .av{border-radius:14px;padding:20px 22px;border:1px solid var(--border);}
+  .av.noise{border-top:3px solid var(--red);background:var(--surface);}
+  .av.signal{border-top:3px solid var(--green);background:var(--surface);}
+  .av .lab{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;}
+  .av.noise .lab{color:var(--red);} .av.signal .lab{color:var(--green);}
+  .av h3{font-size:18px;margin:6px 0 4px;}
+  .av .one{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:14px;}
+  .av .row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .av .row:last-child{border-bottom:none;}
+  .av .row .k{flex:0 0 88px;color:var(--muted);font-family:var(--mono);font-size:11px;}
+  .av .row .v{color:var(--text);}
+  .verdict{margin-top:14px;font-size:13px;padding:9px 12px;border-radius:8px;}
+  .av.noise .verdict{background:rgba(184,92,92,.12);color:var(--red);}
+  .av.signal .verdict{background:rgba(111,168,111,.12);color:var(--green);}
+
+  /* deep profile */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+  .card h3{font-size:14px;margin:0 0 12px;font-weight:600;color:var(--cream);}
+  .card ul{margin:0;padding-left:16px;font-size:13px;}
+  .card li{margin-bottom:7px;}
+  .card li b{color:var(--cream);}
+
+  .q{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:9px;font-size:13.5px;font-style:italic;}
+  .q .who{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:5px;}
+
+  .ladder{display:flex;flex-direction:column-reverse;gap:5px;}
+  .rung{display:grid;grid-template-columns:30px 1fr 1fr;gap:14px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;}
+  .rung .n{font-family:var(--mono);font-weight:700;color:var(--cream);}
+  .rung .b{font-size:13px;}.rung .t{font-size:12px;color:var(--muted);}
+  .rung.block{border-left:3px solid var(--terra);}
+
+  .hyp{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:12px;border-left:3px solid var(--green);}
+  .hyp .hid{font-family:var(--mono);font-size:11px;color:var(--green);}
+  .hyp .ht{font-size:14.5px;margin:5px 0 0;}.hyp .ht b{color:var(--cream);}
+
+  .so{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--cream);border-radius:14px;padding:24px 28px;}
+  .so ul{margin:0;padding-left:18px;}.so li{font-size:14.5px;margin-bottom:10px;}.so li b{color:var(--cream);}
+
+  .foot{margin-top:46px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:18px;}
+  @media(max-width:820px){.duo,.grid2{grid-template-columns:1fr;}.svn td{width:auto;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Signal vs Noise — ICP Brief <span class="hl">v2</span></h1>
+    <p class="sub">v1 had a selection problem. It weighted a broke, fearful, declined prospect (Anthony) as if he were the target. He isn't — he's noise. This rebuild separates signal from noise and profiles the high-agency buyer worth 10x the attention: the Olivia type.</p>
+    <div class="meta">
+      <span class="chip">signal anchor · <b>Olivia Stevermer</b> · real PIF</span>
+      <span class="chip">+ high-agency closes · <b>Logan, Ella</b></span>
+      <span class="chip">contrast · <b>Anthony</b> (noise, declined)</span>
+      <span class="chip">via · Fathom + avatar dossier</span>
+    </div>
+  </header>
+
+  <!-- CORRECTION -->
+  <h2 class="sec">1 · The correction</h2>
+  <div class="panel correction">
+    <p>If you build the funnel around the people who <b>didn't buy and couldn't pay</b>, you build a funnel that attracts more people who won't buy and can't pay. v1's headline rec — "move financing earlier" — is a <b>noise-driven optimization</b>. It lowers the bar to convert more Anthonys.</p>
+    <p>The opposite move is the real one: <b>raise the bar and repel the noise</b>, so the funnel fills with Olivias — people for whom $5,800 PIF is a Tuesday, who decide in a weekend, and who actually execute. Fewer, better. The job of intelligence isn't to describe everyone who showed up. It's to find <b>who's worth showing up for.</b></p>
+  </div>
+
+  <!-- SOP -->
+  <h2 class="sec">2 · The signal-vs-noise SOP</h2>
+  <p class="sec-lede">Score every prospect on these markers before a closer's time is spent. <b>3+ signal markers → fast-track.</b> 3+ noise markers → free community / nurture, do not burn the close.</p>
+  <div class="panel" style="padding:0;overflow:hidden">
+    <table class="svn">
+      <thead><tr><th class="sig">Signal — high agency (chase)</th><th class="noi">Noise — low agency (deflect)</th></tr></thead>
+      <tbody>
+        <tr><td class="sig">Already earns well / has capital ($4k+/mo or savings)</td><td class="noi">Just laid off, broke, "bad space right now"</td></tr>
+        <tr><td class="sig">Has <b>built and finished things</b> before (ventures, a book, a brand)</td><td class="noi">Starts things, finishes none; no track record</td></tr>
+        <tr><td class="sig">Decides fast — deposits immediately, PIF or commits same week</td><td class="noi">Postpones, "let me think," needs 3+ touches</td></tr>
+        <tr><td class="sig">Money is <b>not</b> the objection</td><td class="noi">Money is THE objection; asks for the cheapest path</td></tr>
+        <tr><td class="sig">Pain is <b>identity / fulfillment</b> ("rotting," "an NPC," disowned art)</td><td class="noi">Pain is survival ("replace the income I just lost")</td></tr>
+        <tr><td class="sig">Wants brutal honesty, a system to lock into, intensity. "I love a challenge."</td><td class="noi">Wants reassurance and safety more than a challenge</td></tr>
+        <tr><td class="sig">Self-selected via the paid ad and booked directly</td><td class="noi">Price-shopping, "free resources first"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AVATAR CONTRAST -->
+  <h2 class="sec">3 · Same funnel, two humans</h2>
+  <div class="duo">
+    <div class="av noise">
+      <div class="lab">Noise</div>
+      <h3>Anthony</h3>
+      <div class="one">"I'm just in a bad, bad space right now."</div>
+      <div class="row"><span class="k">situation</span><span class="v">Laid off after 20 yrs in sales, financially unstable</span></div>
+      <div class="row"><span class="k">pain</span><span class="v">Survival — needs income, fast</span></div>
+      <div class="row"><span class="k">money</span><span class="v">The objection. Couldn't justify it.</span></div>
+      <div class="row"><span class="k">block</span><span class="v">Fear, "worst case scenario," skepticism</span></div>
+      <div class="row"><span class="k">decision</span><span class="v">Declined</span></div>
+      <div class="verdict">Optimizing for him = a broke, fearful, slow funnel.</div>
+    </div>
+    <div class="av signal">
+      <div class="lab">Signal</div>
+      <h3>Olivia</h3>
+      <div class="one">"The tech job is the cage and the open mic is the church."</div>
+      <div class="row"><span class="k">situation</span><span class="v">SaaS account exec, 24, earning, in LA for comedy</span></div>
+      <div class="row"><span class="k">pain</span><span class="v">Identity — "rotting in an office," an NPC, disowned art</span></div>
+      <div class="row"><span class="k">money</span><span class="v">Not the objection. Has it.</span></div>
+      <div class="row"><span class="k">block</span><span class="v">Noise / overwhelm + quiet self-doubt</span></div>
+      <div class="row"><span class="k">decision</span><span class="v">$5,800 PIF — $100 deposit, paid in full by Monday</span></div>
+      <div class="verdict">Optimizing for her = a fast, high-margin, executing funnel.</div>
+    </div>
+  </div>
+
+  <!-- DEEP PROFILE -->
+  <h2 class="sec">4 · The signal ICP — "the creative in a corporate cage"</h2>
+  <p class="sec-lede">A high-income professional (tech, sales, corporate) with a <b>disowned creative identity</b>. 24–40. Resourced. The job pays the bills and kills the soul. UGC isn't about money — it's the <b>practical vehicle to fund the art and buy back the self.</b></p>
+  <div class="grid2">
+    <div class="card"><h3>What she actually wants</h3>
+      <ul>
+        <li><b>Time + financial freedom</b> — "do what I want when I want, from the beach"</li>
+        <li>To stop compromising <b>artistic integrity for money</b></li>
+        <li>A <b>system to lock into</b> that cuts the noise — not more information</li>
+        <li>A mentor with <b>intensity she trusts</b> — picked Gloria for exactly this</li>
+        <li>Someone to <b>"gaslight me into being confident and tell me exactly what to do"</b></li>
+        <li>Brutal honest feedback — "tell me my video sucks," not flowery praise</li>
+      </ul>
+    </div>
+    <div class="card"><h3>How she buys (and why it's different)</h3>
+      <ul>
+        <li><b>Money isn't the gate</b> — she earns. The gate is trust + does this cut the noise</li>
+        <li>Decides <b>fast and pays in full</b> — agency is the through-line</li>
+        <li>Buys the <b>mentor's intensity + the system</b>, not the income claim</li>
+        <li>Quit threshold $5k/mo · dream $15k/mo · wants out by her birthday</li>
+        <li>Came from a <b>paid ad</b> (saw Gloria), self-selected, booked direct</li>
+        <li>Has a <b>build history</b> (book, protein-pudding biz, freelance) — she ships</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LANGUAGE -->
+  <h2 class="sec">5 · Signal language bank — Olivia, verbatim</h2>
+  <div class="grid2">
+    <div>
+      <div class="q">"You kind of just have to be an NPC every day... rotting in an office."<span class="who">the cage</span></div>
+      <div class="q">"Artists run into this battle where they compromise the artistic integrity because they have to make money."<span class="who">the real wound</span></div>
+      <div class="q">"So many pieces of information... so much noise. I'd rather find the system that works and lock in on that."<span class="who">the bottleneck — NOT money</span></div>
+    </div>
+    <div>
+      <div class="q">"I really just need someone to gaslight me into being confident and tell me exactly what to do."<span class="who">the master key — from her survey</span></div>
+      <div class="q">"I'd rather have someone tell me my video sucks than a bunch of flowery [feedback]."<span class="who">wants intensity, not comfort</span></div>
+      <div class="q">"There's a certain intensity I really like. I actually trust her to guide me."<span class="who">why she picked Gloria</span></div>
+    </div>
+  </div>
+
+  <!-- BELIEF LADDER -->
+  <h2 class="sec">6 · The signal belief ladder (it's a different climb)</h2>
+  <p class="sec-lede">She's already past the rungs that block the noise. She can afford it and believes in the skill. Her ladder is about <b>trust and noise-reduction</b>, not money and fear-of-failure.</p>
+  <div class="panel">
+    <div class="ladder">
+      <div class="rung"><span class="n">1</span><span class="b">"I'm capable and I can afford this."</span><span class="t">Already true — never sell down to her on price.</span></div>
+      <div class="rung"><span class="n">2</span><span class="b">"UGC can fund the life and the art."</span><span class="t">She gets it — it's the vehicle, not the dream.</span></div>
+      <div class="rung block"><span class="n">3</span><span class="b">"This system cuts the noise I'm drowning in." ← the gate</span><span class="t">Sell the system + the lock-in, not more content.</span></div>
+      <div class="rung block"><span class="n">4</span><span class="b">"I trust THIS mentor's intensity to push me."</span><span class="t">Gloria's intensity is the conversion asset. Lead with it.</span></div>
+      <div class="rung"><span class="n">5</span><span class="b">"I'm allowed to reclaim the creative self I shelved."</span><span class="t">Identity permission → the PIF.</span></div>
+    </div>
+  </div>
+
+  <!-- HYPOTHESES -->
+  <h2 class="sec">7 · Bets to attract more signal (and repel noise)</h2>
+  <div class="hyp"><div class="hid">H1 · angle</div><p class="ht">If <b>high-earning creatives in respectable jobs</b> see a <b>"you're not broke, you're caged — the open mic is the church"</b> identity angle, then signal-lead share rises and DQ rate drops.</p></div>
+  <div class="hyp"><div class="hid">H2 · qualifier</div><p class="ht">If the Typeform <b>raises the income/agency bar</b> (already-earning, has-built-before) instead of leading with budget, then closer time concentrates on PIF-likely prospects and CPBC-to-cash improves.</p></div>
+  <div class="hyp"><div class="hid">H3 · message</div><p class="ht">If ads sell <b>Gloria's intensity + "a system that cuts the noise"</b> rather than income claims, then the prospects who book self-select toward high agency.</p></div>
+  <div class="hyp"><div class="hid">H4 · hook</div><p class="ht">If a cold ad opens with <b>"I needed someone to gaslight me into confidence and tell me exactly what to do"</b> (Olivia's own words), it will magnetize her twin and bore the tire-kicker.</p></div>
+
+  <!-- SO WHAT -->
+  <h2 class="sec">8 · What I'd act on</h2>
+  <div class="so">
+    <ul>
+      <li><b>Re-cut the qualifier to score agency, not budget.</b> "Are you currently earning?" + "What have you built before?" beats "What's your budget?" The first finds Olivias; the second finds Anthonys.</li>
+      <li><b>Make the hero angle identity, not income.</b> "You're not broke — you're caged." Sell reclaiming the disowned creative self. Money claims attract the desperate; identity attracts the resourced.</li>
+      <li><b>Lead with Gloria's intensity as the differentiator.</b> Signal buyers pick the mentor, not the curriculum. "I'll tell you your video sucks" is a feature to Olivia, a threat to Anthony — that's the filter working.</li>
+      <li><b>Reverse v1: don't rush to financing.</b> Financing is a noise-magnet. PIF buyers are the signal. Protect the price; let it repel.</li>
+      <li><b>Tag every closed customer Signal / Noise going forward.</b> Build the bot's training set so it learns to predict agency from the application alone — that's the compounding edge.</li>
+    </ul>
+  </div>
+
+  <div class="foot">ICP Brief v2 · signal vs noise · anchored on the Olivia Stevermer real-PIF dossier + high-agency closes (Logan, Ella), contrasted against the noise archetype (Anthony, declined). The point of v2: the bot's job is to find who's worth chasing, not to average everyone who booked. Next: tag the converted-customers + Top-100-applicants set Signal/Noise and let the bot learn the predictive markers.</div>
+
+</div>
+</body>
+</html>
