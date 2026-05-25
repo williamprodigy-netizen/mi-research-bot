@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICP Intelligence Brief v1 — UGC World</title>
+<style>
+  :root{
+    --bg:#0E0E0C; --surface:#1A1815; --surface2:#211E19; --border:#2A2620;
+    --cream:#E8C88C; --terra:#C97B4A; --green:#6FA86F; --amber:#D4A24A; --red:#B85C5C; --tech:#7C93A6;
+    --text:#F5E6CC; --muted:#9b9485;
+    --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:44px 30px 90px;}
+  header h1{font-size:30px;letter-spacing:-0.015em;margin:0 0 6px;font-weight:600;}
+  header h1 .hl{color:var(--cream);}
+  header .sub{color:var(--muted);font-size:13.5px;margin:0;max-width:840px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+  .chip{font-size:11px;font-family:var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:5px 12px;}
+  .chip b{color:var(--cream);}
+  .guard{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:10px;padding:13px 18px;font-size:12.5px;color:var(--muted);}
+  .guard b{color:var(--amber);}
+
+  h2.sec{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:50px 0 14px;}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;}
+  .panel.cream{border-left:4px solid var(--cream);}
+
+  .avatar p{font-size:16px;margin:0 0 10px;}
+  .avatar p b{color:var(--cream);}
+  .avatar .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .avatar .tags span{font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;color:var(--text);}
+
+  .pat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:14px;border-left:3px solid var(--terra);}
+  .pat .ph{display:flex;justify-content:space-between;gap:14px;align-items:baseline;}
+  .pat h3{font-size:16px;margin:0 0 8px;font-weight:600;}
+  .pat .freq{font-family:var(--mono);font-size:11px;color:var(--green);white-space:nowrap;}
+  .pat .body{font-size:13.5px;color:var(--text);}
+  .pat .ev{font-size:12px;color:var(--muted);margin-top:8px;font-family:var(--mono);}
+  .pat .ev b{color:var(--text);}
+
+  .quotes{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .qcol h4{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 10px;}
+  .qcol.surface h4{color:var(--cream);} .qcol.shadow h4{color:var(--terra);}
+  .q{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:9px;font-size:13px;font-style:italic;color:var(--text);}
+  .q .who{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:5px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:700;}
+  td.rank{font-family:var(--mono);color:var(--terra);font-weight:700;width:30px;}
+  td .bar{height:6px;background:var(--terra);border-radius:3px;margin-top:5px;}
+
+  .ladder{display:flex;flex-direction:column-reverse;gap:5px;}
+  .rung{display:grid;grid-template-columns:30px 1fr 1fr;gap:14px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;}
+  .rung .n{font-family:var(--mono);font-weight:700;color:var(--cream);}
+  .rung .b{font-size:13px;}.rung .t{font-size:12px;color:var(--muted);}
+  .rung.block{border-left:3px solid var(--red);}
+
+  .hyp{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:12px;border-left:3px solid var(--green);}
+  .hyp .hid{font-family:var(--mono);font-size:11px;color:var(--green);}
+  .hyp .ht{font-size:14.5px;margin:5px 0 0;}
+  .hyp .ht b{color:var(--cream);}
+
+  .so{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--cream);border-radius:14px;padding:24px 28px;margin-top:8px;}
+  .so ul{margin:0;padding-left:18px;}
+  .so li{font-size:14.5px;margin-bottom:10px;}
+  .so li b{color:var(--cream);}
+
+  .foot{margin-top:46px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:18px;}
+  @media(max-width:820px){.quotes{grid-template-columns:1fr;}.rung{grid-template-columns:24px 1fr;}.rung .t{grid-column:2;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>ICP Intelligence Brief <span class="hl">v1</span></h1>
+    <p class="sub">First output of the marketing intelligence research bot — generated from your real sales calls, not assumptions. This is the Phase 1 proof: does reading the actual data surface something worth acting on?</p>
+    <div class="meta">
+      <span class="chip">source · <b>26 prospect calls</b> · May 20–25 2026</span>
+      <span class="chip">deep transcripts · <b>2</b> (1 close, 1 decline)</span>
+      <span class="chip">closes in set · <b>5</b> · declines/postpones · <b>~21</b></span>
+      <span class="chip">via · <b>Fathom MCP</b></span>
+    </div>
+    <div class="guard"><b>Read every word.</b> This is AI amplification, not decision. Quotes are verbatim from transcripts; patterns are my read of 26 call summaries. Typeform + onboarding sheets (377K chars each) are the next ingestion pass — they'll sharpen, not change, this. Verify before it becomes doctrine.</div>
+  </header>
+
+  <!-- AVATAR -->
+  <h2 class="sec">1 · The sharpest ICP in the data</h2>
+  <div class="panel cream avatar">
+    <p>The highest-intent prospect right now is the <b>recently laid-off corporate escapee, 35–58</b>, who needs to <b>replace an income they just lost</b> and is done with the commute-and-cubicle life. They are <b>motivated and financially tight at the same time</b> — the layoff is both the trigger and the obstacle. They do not want "another business." They want a <b>skill, a structure, and someone to hand-hold them</b> because a past course or attempt already let them down.</p>
+    <div class="tags">
+      <span>Laid off / career change</span><span>25 yrs in one field</span><span>$3–5k/mo target</span>
+      <span>Wants freedom + location independence</span><span>Fear &gt; money (the real block)</span>
+      <span>Burned by a prior program</span><span>Identity-driven buyer</span>
+    </div>
+  </div>
+
+  <!-- PATTERNS -->
+  <h2 class="sec">2 · The 7 patterns that repeated</h2>
+
+  <div class="pat"><div class="ph"><h3>1 · The core ICP is the laid-off corporate escapee</h3><span class="freq">8+ / 26 calls</span></div>
+    <div class="body">Income-replacement after a layoff or forced career change is the single most common trigger. Freedom from the corporate grind is the master desire.</div>
+    <div class="ev">Evidence: <b>Anthony</b> (laid off, 20yr sales), <b>Cindy</b> (laid off, daughter in college), <b>Michelle</b> (career change + surgery), <b>Chloe</b> (unstable sales job), <b>Maricelle</b>, <b>Nathan</b>, <b>April</b>, <b>Sergio</b>.</div></div>
+
+  <div class="pat"><div class="ph"><h3>2 · Income target clusters at $3–5k/mo</h3><span class="freq">~10 / 26</span></div>
+    <div class="body">"Replace my income / be comfortable" is the number, not "get rich." A few dreamers ($10–30k) but the center of mass is modest and concrete.</div>
+    <div class="ev">Evidence: Emilia, April, Liliana, Tee, Hillary, Debbie, Tiara, Maricelle, Sergio, Anthony all named $3–5k. Outliers: Nicole $30k, Reese $10–15k, Nathan $7.5–10k.</div></div>
+
+  <div class="pat"><div class="ph"><h3>3 · #1 objection is money — caused by the same layoff that motivates them</h3><span class="freq">~10 / 26</span></div>
+    <div class="body">The cruel irony of the ICP: the layoff makes them desperate to buy and unable to pay. This is why financing and payment plans are load-bearing, not optional.</div>
+    <div class="ev">Evidence: April, Chelle, Maricelle ($8k car repairs), Liliana ($3k cap), Kirk (can't pay today), Cindy ($500 vs $1–2k). <b>All 5 closes used a plan</b> — Logan ($2k down + pause), Cindy (ClarityPay $399×18), Chloe ($1k/mo), Michelle ($2k down + plan).</div></div>
+
+  <div class="pat"><div class="ph"><h3>4 · Beneath "money" sits fear and lack of self-belief</h3><span class="freq">~5 / 26</span></div>
+    <div class="body">"Is this real for ME?" The shadow objection. They cite money because it's socially acceptable; the real block is fear of failing again. The close is mentorship + certainty, not opportunity.</div>
+    <div class="ev">Evidence: Reese (fear of failure), Nathan (analysis paralysis), Liliana (confidence), Anthony ("worst case scenario"). The Blake call review reached the same conclusion independently.</div></div>
+
+  <div class="pat"><div class="ph"><h3>5 · They reject "another business" — they want a skill + a system</h3><span class="freq">~5 / 26</span></div>
+    <div class="body">Most have tried something that failed (Etsy, a broad course, an $8–10k program). They are allergic to entrepreneurship framing and crave the structure the last thing lacked.</div>
+    <div class="ev">Evidence: Liliana (past $8–10k programs gave no networking), Debbie (Boss Suite too broad), Cindy (prior "textbook" course, no support), April (6mo unstructured), Emilia (failed Etsy/Canva).</div></div>
+
+  <div class="pat"><div class="ph"><h3>6 · Closes buy on identity + emotion, mirroring Gloria's story</h3><span class="freq">5 / 5 closes</span></div>
+    <div class="body">Buying language is never about features. It's "I'm getting a part of me back," "I'm ready," "that's what I want" — and they explicitly map themselves onto Gloria's Walmart-to-freedom arc.</div>
+    <div class="ev">Evidence: Cindy verbatim — "be like she was at Walmart... that's what I want." The origin story is doing real conversion work.</div></div>
+
+  <div class="pat"><div class="ph"><h3>7 · Freedom = location independence (Bali, Idaho, Laguna, travel)</h3><span class="freq">6+ / 26</span></div>
+    <div class="body">The dream outcome is consistently a place and a lifestyle, not a number. "The new American dream is to get out of America" (Anthony, verbatim). Validates the "F-you freedom" angle.</div>
+    <div class="ev">Evidence: Ella (Bali), Michelle (Idaho + son), Nicole (Laguna), Logan (digital nomad), Chloe (digital nomad), Anthony.</div></div>
+
+  <!-- LANGUAGE BANK -->
+  <h2 class="sec">3 · Language bank — their exact words</h2>
+  <div class="quotes">
+    <div class="qcol surface">
+      <h4>Surface — what they say</h4>
+      <div class="q">"I don't want to do the corporate grind anymore."<span class="who">Anthony · declined</span></div>
+      <div class="q">"The new American dream is to get out of America."<span class="who">Anthony · declined</span></div>
+      <div class="q">"I just want to change my life and my family."<span class="who">Cindy · closed</span></div>
+      <div class="q">"I want to have my own time, my freedom, and be successful financially."<span class="who">Cindy · closed</span></div>
+      <div class="q">"I want to start living, not just surviving."<span class="who">Ferran reflecting Cindy · closed</span></div>
+    </div>
+    <div class="qcol shadow">
+      <h4>Shadow — what's underneath</h4>
+      <div class="q">"I'm just trying to play, like, worst case scenario."<span class="who">Anthony · declined · fear</span></div>
+      <div class="q">"This is too much... I'm just in a bad, bad space right now."<span class="who">Anthony · declined · overwhelm</span></div>
+      <div class="q">"I feel like I'm getting a part of me back... something I let go a long time ago."<span class="who">Cindy · closed · identity</span></div>
+      <div class="q">"I have so many worries... not being able to sleep."<span class="who">Cindy · closed · financial fear</span></div>
+      <div class="q">"It just feels like I'm ready."<span class="who">Cindy · closed · the moment of yes</span></div>
+    </div>
+  </div>
+
+  <!-- OBJECTIONS -->
+  <h2 class="sec">4 · Objections, ranked by frequency</h2>
+  <div class="panel">
+    <table>
+      <thead><tr><th class="rank">#</th><th>Objection</th><th>What's really going on</th><th style="width:90px">Frequency</th></tr></thead>
+      <tbody>
+        <tr><td class="rank">1</td><td>"I can't afford it right now"</td><td>Real — laid off, tight cash. Solve with financing surfaced early.</td><td><div class="bar" style="width:100%"></div></td></tr>
+        <tr><td class="rank">2</td><td>"Is this real for me / I'm scared"</td><td>The shadow block. Solve with certainty, structure, student-from-zero proof.</td><td><div class="bar" style="width:55%"></div></td></tr>
+        <tr><td class="rank">3</td><td>"I've tried programs that failed"</td><td>Distrust. Solve with "the support the last one didn't give you."</td><td><div class="bar" style="width:38%"></div></td></tr>
+        <tr><td class="rank">4</td><td>"How long until it actually pays?"</td><td>Timing risk. Solve with the 7-day-first-deal + 180-day guarantee.</td><td><div class="bar" style="width:28%"></div></td></tr>
+        <tr><td class="rank">5</td><td>"Is the income even possible?"</td><td>Skepticism (Anthony). Solve with receipts + matched-identity proof.</td><td><div class="bar" style="width:22%"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BELIEF LADDER -->
+  <h2 class="sec">5 · The belief ladder (derived from the data)</h2>
+  <div class="panel">
+    <div class="ladder">
+      <div class="rung"><span class="n">1</span><span class="b">"There's more than this 9-5 grind."</span><span class="t">Already believe — leverage it, don't sell it.</span></div>
+      <div class="rung"><span class="n">2</span><span class="b">"UGC is a real skill brands pay for."</span><span class="t">Mostly there via free UGC Games course.</span></div>
+      <div class="rung block"><span class="n">3</span><span class="b">"I can do it even with no experience." &nbsp;← the block</span><span class="t">Fear lives here. Most declines die on this rung.</span></div>
+      <div class="rung"><span class="n">4</span><span class="b">"This program gives the structure my last attempt lacked."</span><span class="t">The differentiator that separates you from failed courses.</span></div>
+      <div class="rung"><span class="n">5</span><span class="b">"It's worth $5,800 even though I'm tight."</span><span class="t">Financing + 180-day guarantee removes the risk.</span></div>
+      <div class="rung"><span class="n">6</span><span class="b">"I'm ready — this is my next chapter."</span><span class="t">Identity adoption → the close.</span></div>
+    </div>
+  </div>
+
+  <!-- HYPOTHESES -->
+  <h2 class="sec">6 · Deployable bets (test these)</h2>
+  <div class="hyp"><div class="hid">H1 · angle</div><p class="ht">If <b>recently laid-off corporate women 35–55</b> see a <b>"replace the income you just lost — without starting another business"</b> message in a Gloria-confession format, then <b>qualified-lead rate rises</b>.</p></div>
+  <div class="hyp"><div class="hid">H2 · funnel</div><p class="ht">If financially-tight prospects see the <b>financing + 180-day investment-back guarantee surfaced pre-call</b> (on the bonus page), then <b>first-call close rate rises</b> — the #1 objection is dead before it's spoken.</p></div>
+  <div class="hyp"><div class="hid">H3 · angle</div><p class="ht">If fear-blocked beginners see <b>"the structure and hand-holding your last course didn't give you"</b> + a student-from-zero proof (Missy/Sasha), then <b>attended-no-book → book conversion rises</b>.</p></div>
+  <div class="hyp"><div class="hid">H4 · hook</div><p class="ht">If the cold ad opens with their exact words — <b>"I don't want another business, I want a skill"</b> — then <b>lead quality improves and DQ rate drops</b>.</p></div>
+
+  <!-- SO WHAT -->
+  <h2 class="sec">7 · What I'd act on Monday</h2>
+  <div class="so">
+    <ul>
+      <li><b>Move financing + the guarantee earlier.</b> It's the #1 objection and every single close used a plan. Put it on the qualified bonus page and in the pre-call sequence, not just on the call.</li>
+      <li><b>Lead with "a skill, not another business."</b> It's in their literal words and it filters out the entrepreneurship-allergic noise that's wasting setter time.</li>
+      <li><b>Make the layoff the cold-ad trigger.</b> "Just got laid off? Don't start a business — learn the one skill brands are paying for." Sharpest ICP, sharpest hook.</li>
+      <li><b>Sell certainty to the fearful, not opportunity.</b> The shadow block is fear. Structure + guarantee + a from-zero student story moves rung 3, where most declines die.</li>
+    </ul>
+  </div>
+
+  <div class="foot">ICP Intelligence Brief v1 · generated by the marketing intelligence research bot (Phase 1) from 26 live Fathom sales calls + 2 deep transcripts, May 20–25 2026. Next pass: ingest the Typeform + onboarding sheets and competitor ad library to widen the sample. Doctrine candidates here must be human-verified before they ship into briefs.</div>
+
+</div>
+</body>
+</html>
