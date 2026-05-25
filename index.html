@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Intelligence Research Bot — Build Blueprint</title>
+<style>
+  :root{
+    --bg:#0E0E0C; --surface:#1A1815; --surface2:#211E19; --border:#2A2620;
+    --cream:#E8C88C; --terra:#C97B4A; --green:#6FA86F; --amber:#D4A24A; --red:#B85C5C; --tech:#7C93A6;
+    --text:#F5E6CC; --muted:#9b9485;
+    --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1180px;margin:0 auto;padding:44px 30px 90px;}
+  header h1{font-size:32px;letter-spacing:-0.015em;margin:0 0 6px;font-weight:600;}
+  header h1 .hl{color:var(--cream);}
+  header .sub{color:var(--muted);font-size:14px;margin:0;max-width:820px;}
+  nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+  nav a{color:var(--muted);text-decoration:none;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;border:1px solid var(--border);border-radius:6px;padding:6px 11px;}
+  nav a:hover{color:var(--cream);border-color:var(--cream);}
+
+  h2.sec{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:52px 0 4px;}
+  .sec-lede{font-size:15px;margin:0 0 22px;max-width:880px;}
+  .sec-lede b{color:var(--cream);}
+
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;}
+  .panel.q{border-left:4px solid var(--cream);}
+  .panel .qt{font-size:18px;line-height:1.5;margin:0;}
+  .panel .qt b{color:var(--cream);}
+  .panel .qa{font-size:13px;color:var(--muted);margin:12px 0 0;font-family:var(--mono);}
+
+  /* pipeline rail */
+  .rail{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;margin-top:8px;}
+  .stg{flex:1;min-width:130px;background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--cream);border-radius:10px;padding:14px 13px;position:relative;}
+  .stg + .stg{margin-left:20px;}
+  .stg + .stg:before{content:"\203A";position:absolute;left:-15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px;}
+  .stg .s-n{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .stg h4{margin:3px 0 5px;font-size:14px;font-weight:600;}
+  .stg .s-d{font-size:11.5px;color:var(--muted);}
+  .stg.t1{border-top-color:var(--tech);} .stg.t2{border-top-color:var(--amber);} .stg.t3{border-top-color:var(--terra);} .stg.t4{border-top-color:var(--green);}
+  .loopnote{font-size:12px;color:var(--muted);margin-top:12px;}
+  .loopnote b{color:var(--cream);}
+
+  /* two-col grids */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+  .card h3{font-size:14px;margin:0 0 12px;font-weight:600;}
+  .card.ext{border-left:3px solid var(--amber);} .card.int{border-left:3px solid var(--green);}
+  .src{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .src:last-child{border-bottom:none;}
+  .src .nm{color:var(--text);} .src .via{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;}
+  .src .via.live{color:var(--green);} .src .via.build{color:var(--amber);} .src .via.todo{color:var(--muted);}
+
+  .out{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:10px;}
+  .out .ot{font-size:14px;font-weight:600;color:var(--cream);}
+  .out .od{font-size:12.5px;color:var(--muted);margin-top:3px;}
+
+  /* stack layers */
+  .layer{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:start;padding:14px 0;border-bottom:1px solid var(--border);}
+  .layer:last-child{border-bottom:none;}
+  .layer .ln{font-size:13px;font-weight:600;color:var(--cream);}
+  .layer .ln small{display:block;color:var(--muted);font-weight:400;font-size:11px;font-family:var(--mono);margin-top:2px;}
+  .layer .ld{font-size:13px;color:var(--text);}
+  .layer .ld b{color:var(--cream);}
+
+  /* checklist */
+  .chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .chk{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+  .chk.full{grid-column:1 / -1;}
+  .chk h3{font-size:14px;margin:0 0 4px;font-weight:600;}
+  .chk .ch-sub{font-size:12px;color:var(--muted);margin:0 0 12px;}
+  .ci{display:flex;gap:11px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--border);cursor:pointer;}
+  .ci:last-child{border-bottom:none;}
+  .ci .box{flex:0 0 17px;height:17px;border:1.5px solid var(--muted);border-radius:4px;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .ci .box svg{width:11px;height:11px;opacity:0;}
+  .ci.done .box{background:var(--green);border-color:var(--green);}
+  .ci.done .box svg{opacity:1;}
+  .ci .txt{font-size:13px;}
+  .ci.done .txt{color:var(--muted);text-decoration:line-through;}
+  .ci .txt b{color:var(--cream);font-weight:600;}
+  .ci .txt small{display:block;color:var(--muted);font-size:11px;margin-top:1px;}
+  .have .box{background:var(--cream);border-color:var(--cream);}
+  .have .box svg{opacity:1;}
+  .have .txt{color:var(--muted);}
+
+  /* phases */
+  .phases{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .ph{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;border-top:3px solid var(--border);}
+  .ph.p1{border-top-color:var(--tech);}.ph.p2{border-top-color:var(--amber);}.ph.p3{border-top-color:var(--terra);}.ph.p4{border-top-color:var(--cream);}
+  .ph .pn{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .ph .ph-h{font-size:16px;font-weight:600;margin:4px 0 10px;}
+  .ph ul{margin:0;padding-left:16px;font-size:12.5px;color:var(--text);}
+  .ph li{margin-bottom:6px;}
+
+  .takeaway{margin-top:50px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:14px;padding:26px 30px;}
+  .takeaway h2{font-size:13px;letter-spacing:0.16em;text-transform:uppercase;color:var(--green);margin:0 0 12px;}
+  .takeaway p{font-size:17px;margin:0 0 10px;max-width:860px;}
+  .takeaway .doctrine{font-family:var(--mono);font-size:13px;color:var(--cream);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:8px;}
+
+  .foot{margin-top:46px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:18px;}
+  @media(max-width:860px){.cols,.cols3,.chk-grid,.phases{grid-template-columns:1fr;}.layer{grid-template-columns:1fr;gap:4px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Marketing Intelligence <span class="hl">Research Bot</span> — build blueprint</h1>
+    <p class="sub">How I'd build you a bot that turns raw market signal into deployable creative doctrine, and compounds it every cycle. Grounded in your operating model: marketing as a probabilistic system, run like a trading desk.</p>
+    <nav>
+      <a href="#what">What it is</a><a href="#loop">The loop</a><a href="#inputs">Inputs</a>
+      <a href="#outputs">Outputs</a><a href="#stack">Architecture</a><a href="#skills">Skills checklist</a>
+      <a href="#phases">Build order</a><a href="#standard">The standard</a>
+    </nav>
+  </header>
+
+  <!-- WHAT -->
+  <h2 class="sec" id="what">1 · What it actually is</h2>
+  <div class="panel q">
+    <p class="qt">A research analyst that never sleeps. It reads every sales call, application, DM, competitor ad, and Reddit thread, finds <b>what repeats</b>, translates it into <b>angles, hooks, and beliefs</b>, places those as testable bets, then watches the results and <b>rewrites its own playbook</b> — so every cycle is a smarter bet than the last.</p>
+    <p class="qa">trader parallel · market data → pattern → trade → PnL → journal → refine · the bot owns the "journal → refine" loop most teams skip</p>
+  </div>
+  <p class="sec-lede" style="margin-top:18px">It is NOT a dashboard. Dashboards report numbers. This produces <b>doctrine</b> — reusable rules like "corporate women with failed side hustles respond 2.1x better to identity-liberation than money claims." The hard rule from your doc holds: <b>AI amplifies, it does not decide. A human reads every word.</b></p>
+
+  <!-- LOOP -->
+  <h2 class="sec" id="loop">2 · The intelligence loop</h2>
+  <p class="sec-lede">Your master loop — Sense → Make sense → Choose → Ship → Observe → Learn → Encode → Scale — expressed as the bot's seven-stage pipeline. It runs continuously; the heavy synthesis fires on a weekly cadence.</p>
+  <div class="rail">
+    <div class="stg t1"><div class="s-n">01</div><h4>Acquire</h4><div class="s-d">pull raw signal from every source, automatically</div></div>
+    <div class="stg t1"><div class="s-n">02</div><h4>Enrich</h4><div class="s-d">clean, dedupe, ICP-filter (wrong ICP = poison)</div></div>
+    <div class="stg t2"><div class="s-n">03</div><h4>Interpret</h4><div class="s-d">extract verbatim language, surface + shadow</div></div>
+    <div class="stg t2"><div class="s-n">04</div><h4>Synthesize</h4><div class="s-d">find what repeats across sources → patterns</div></div>
+    <div class="stg t3"><div class="s-n">05</div><h4>Codify</h4><div class="s-d">patterns → angles, hooks, hypotheses, doctrine</div></div>
+    <div class="stg t4"><div class="s-n">06</div><h4>Deploy</h4><div class="s-d">feed briefs; place the bet against the market</div></div>
+    <div class="stg t4"><div class="s-n">07</div><h4>Measure</h4><div class="s-d">ingest performance → update doctrine → loop</div></div>
+  </div>
+  <div class="loopnote">Stage 07 feeds back into Stage 01: every result (win or loss) becomes a new signal. <b>The loop is the product</b> — a single pass is just research; the compounding is the moat.</div>
+
+  <!-- INPUTS -->
+  <h2 class="sec" id="inputs">3 · Inputs — where it reads from</h2>
+  <p class="sec-lede">Two streams. <b>Internal data is the highest signal</b> (real customers, real money) — start there. External data reveals the shadow desires customers won't say out loud.</p>
+  <div class="cols">
+    <div class="card int">
+      <h3>Internal — highest signal</h3>
+      <div class="src"><span class="nm">Sales call transcripts</span><span class="via live">Fathom MCP · live</span></div>
+      <div class="src"><span class="nm">Typeform applications</span><span class="via live">GHL API · live</span></div>
+      <div class="src"><span class="nm">Onboarding forms</span><span class="via build">Sheets · connect</span></div>
+      <div class="src"><span class="nm">DMs + story replies</span><span class="via todo">export → ingest</span></div>
+      <div class="src"><span class="nm">Past content + winners</span><span class="via build">Notion / Drive</span></div>
+      <div class="src"><span class="nm">Ad performance data</span><span class="via build">Meta API · Supabase</span></div>
+    </div>
+    <div class="card ext">
+      <h3>External — shadow + market</h3>
+      <div class="src"><span class="nm">Competitor ads</span><span class="via build">Meta Ad Library</span></div>
+      <div class="src"><span class="nm">Reddit (adjacent niches)</span><span class="via todo">Reddit API</span></div>
+      <div class="src"><span class="nm">IG / TikTok / YT comments</span><span class="via todo">scrape / API</span></div>
+      <div class="src"><span class="nm">Fiction — film + books</span><span class="via todo">manual seed</span></div>
+      <div class="src"><span class="nm">Music — lyrics that hit</span><span class="via todo">manual seed</span></div>
+      <div class="src"><span class="nm">Direct competitor content</span><span class="via todo">manual + scrape</span></div>
+    </div>
+  </div>
+
+  <!-- OUTPUTS -->
+  <h2 class="sec" id="outputs">4 · Outputs — what it produces</h2>
+  <p class="sec-lede">Every output is an asset that feeds a creative brief. These live in your ICP Brain zone and compound over time.</p>
+  <div class="cols">
+    <div>
+      <div class="out"><div class="ot">ICP / Avatar brief</div><div class="od">the 18-section Master Thesis: desire, awareness, sophistication, beliefs, objections, proof — run on real data, not guesses.</div></div>
+      <div class="out"><div class="ot">Language Bank</div><div class="od">verbatim customer phrases, tagged surface vs shadow. The exact words for hooks.</div></div>
+      <div class="out"><div class="ot">Angle Bank (prioritized)</div><div class="od">psychological reframes, ranked by frequency × recency × cross-source confirmation.</div></div>
+      <div class="out"><div class="ot">Hook + Format libraries</div><div class="od">proven openers and structural forms, with the data on what landed.</div></div>
+    </div>
+    <div>
+      <div class="out"><div class="ot">Objection database</div><div class="od">every "why I wouldn't buy," ranked by frequency — straight from calls.</div></div>
+      <div class="out"><div class="ot">Belief ladder</div><div class="od">the sequence of beliefs a prospect must adopt before the main claim.</div></div>
+      <div class="out"><div class="ot">Hypothesis queue</div><div class="od">testable bets: "If [persona] sees [angle] in [format], then [metric] moves [target]."</div></div>
+      <div class="out"><div class="ot">Doctrine ledger</div><div class="od">codified rules: WHEN → MESSAGE → RESULT → CONFIDENCE. The compounding asset.</div></div>
+    </div>
+  </div>
+
+  <!-- STACK -->
+  <h2 class="sec" id="stack">5 · Architecture — the six layers</h2>
+  <p class="sec-lede">How it's actually wired. You already own half of this; the bot connects the pieces and adds the synthesis + memory layers.</p>
+  <div class="panel">
+    <div class="layer"><div class="ln">1 · Ingestion <small>connectors</small></div><div class="ld">Pulls from each source on a schedule. <b>Fathom MCP + GHL API are already live.</b> Add Meta Ad Library + Reddit + comment pulls. Each source normalized to one record shape.</div></div>
+    <div class="layer"><div class="ln">2 · Store + memory <small>the corpus</small></div><div class="ld">Supabase (or Notion DBs) holding Swipes, Language Bank, Angle Bank, Hypotheses, Doctrine, Tests. <b>This is the institutional memory</b> — the thing that makes it compound instead of reset.</div></div>
+    <div class="layer"><div class="ln">3 · Semantic search <small>recall</small></div><div class="ld">Vector index over the whole corpus so the bot can ask "what have we heard before about X?" Your notes flagged QMD MCP for this — escalate to it once grep stops being enough.</div></div>
+    <div class="layer"><div class="ln">4 · Analysis <small>Claude + master prompts</small></div><div class="ld">Claude runs your 18-section Master Thesis + pattern-recognition prompts as system prompts. Extracts language, finds repetition, writes hypotheses. <b>Human reads every word</b> before it becomes doctrine.</div></div>
+    <div class="layer"><div class="ln">5 · Orchestration <small>cadence</small></div><div class="ld">Cron jobs: continuous ingest, nightly call-scoring, <b>weekly synthesis report</b>. Builds on your existing sales-intel-eod cron pattern.</div></div>
+    <div class="layer"><div class="ln">6 · Output + review <small>surfaces</small></div><div class="ld">Writes the ICP brief + cockpits into the ICP Brain vault zone, posts the weekly Shadow Brief, and a human-in-the-loop review surface to approve doctrine before it ships into briefs.</div></div>
+  </div>
+
+  <!-- SKILLS CHECKLIST -->
+  <h2 class="sec" id="skills">6 · Skills checklist</h2>
+  <p class="sec-lede">Click to tick. Three lists: what the bot must be able to <b>do</b>, what to <b>build</b>, and what you <b>already have</b> (don't rebuild).</p>
+  <div class="chk-grid">
+    <div class="chk">
+      <h3>A · Bot capabilities</h3>
+      <p class="ch-sub">what it must be able to do</p>
+      <div class="ci" data-id="c1"><span class="box">&check;</span><span class="txt">Ingest <b>sales-call transcripts</b><small>auto-pull from Fathom, segment by speaker</small></span></div>
+      <div class="ci" data-id="c2"><span class="box">&check;</span><span class="txt">Ingest <b>applications + onboarding forms</b><small>GHL / Sheets</small></span></div>
+      <div class="ci" data-id="c3"><span class="box">&check;</span><span class="txt">Ingest <b>DMs + competitor ads + Reddit + comments</b></span></div>
+      <div class="ci" data-id="c4"><span class="box">&check;</span><span class="txt"><b>Enrich + ICP-filter</b> raw data<small>dedupe, drop wrong-ICP noise</small></span></div>
+      <div class="ci" data-id="c5"><span class="box">&check;</span><span class="txt">Extract <b>verbatim language</b> — surface + shadow</span></div>
+      <div class="ci" data-id="c6"><span class="box">&check;</span><span class="txt">Run the <b>18-section Master Thesis</b> on real data</span></div>
+      <div class="ci" data-id="c7"><span class="box">&check;</span><span class="txt">Detect <b>patterns</b>: frequency + recency + cross-source</span></div>
+      <div class="ci" data-id="c8"><span class="box">&check;</span><span class="txt">Write <b>hypotheses</b> in IF / SEES / IN / THEN form</span></div>
+      <div class="ci" data-id="c9"><span class="box">&check;</span><span class="txt">Tag <b>awareness + sophistication stage</b></span></div>
+      <div class="ci" data-id="c10"><span class="box">&check;</span><span class="txt">Maintain Angle / Hook / Objection / Belief banks</span></div>
+      <div class="ci" data-id="c11"><span class="box">&check;</span><span class="txt"><b>Codify doctrine</b>: WHEN → MESSAGE → RESULT → CONFIDENCE</span></div>
+      <div class="ci" data-id="c12"><span class="box">&check;</span><span class="txt">Close the loop: ingest <b>performance</b> → update doctrine</span></div>
+      <div class="ci" data-id="c13"><span class="box">&check;</span><span class="txt">Ship a <b>weekly synthesis / Shadow Brief</b></span></div>
+      <div class="ci" data-id="c14"><span class="box">&check;</span><span class="txt"><b>Human-in-the-loop</b> gate — AI amplifies, never decides</span></div>
+    </div>
+    <div class="chk">
+      <h3>B · Build components</h3>
+      <p class="ch-sub">what to stand up, in order</p>
+      <div class="ci" data-id="b1"><span class="box">&check;</span><span class="txt"><b>Ingestion connectors</b><small>Meta Ad Library + Reddit + comment pulls (Fathom/GHL done)</small></span></div>
+      <div class="ci" data-id="b2"><span class="box">&check;</span><span class="txt"><b>Corpus store</b> — Supabase / Notion DBs<small>Swipes · Language · Angles · Hypotheses · Doctrine · Tests</small></span></div>
+      <div class="ci" data-id="b3"><span class="box">&check;</span><span class="txt"><b>Semantic search</b> over the corpus<small>QMD MCP / vector index</small></span></div>
+      <div class="ci" data-id="b4"><span class="box">&check;</span><span class="txt"><b>Master-prompt library</b><small>18-section thesis + pattern + codify prompts as system prompts</small></span></div>
+      <div class="ci" data-id="b5"><span class="box">&check;</span><span class="txt"><b>Orchestration / cron</b><small>continuous ingest + nightly scoring + weekly synthesis</small></span></div>
+      <div class="ci" data-id="b6"><span class="box">&check;</span><span class="txt"><b>Output renderer</b><small>ICP brief + cockpit into ICP Brain zone</small></span></div>
+      <div class="ci" data-id="b7"><span class="box">&check;</span><span class="txt"><b>Review surface</b><small>approve doctrine before it ships into briefs</small></span></div>
+      <div class="ci" data-id="b8"><span class="box">&check;</span><span class="txt"><b>Brief integration</b><small>every brief auto-pulls historical winners + losers + a new hypothesis</small></span></div>
+    </div>
+    <div class="chk full">
+      <h3>C · Already in place — wire into, don't rebuild</h3>
+      <p class="ch-sub">your existing stack the bot plugs straight into</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 28px;">
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>Fathom MCP</b> — sales-call transcripts, live</span></div>
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>GHL API</b> — applications, pipeline, calls</span></div>
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>sales-intelligence skill</b> — nightly call scoring + compounding matrix</span></div>
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>icp-research skill</b> — OBSERVE→HYPOTHESIZE→TEST→SYNTHESIZE→REPORT</span></div>
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>ICP Brain vault zone</b> — where outputs already live</span></div>
+        <div class="ci have"><span class="box">&check;</span><span class="txt"><b>Supabase tracking</b> — in build (Terenz), reuse the schema</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASES -->
+  <h2 class="sec" id="phases">7 · Build order</h2>
+  <p class="sec-lede">Ship value at every phase. Don't build the whole machine before it returns anything.</p>
+  <div class="phases">
+    <div class="ph p1"><div class="pn">Phase 1</div><div class="ph-h">Ingest + brief</div>
+      <ul><li>Wire Fathom + GHL into one corpus store</li><li>Run the 18-section thesis on real calls</li><li>Output: first data-backed ICP brief</li><li>Human reads every word</li></ul></div>
+    <div class="ph p2"><div class="pn">Phase 2</div><div class="ph-h">Patterns + banks</div>
+      <ul><li>Pattern detection across sources</li><li>Build Angle / Hook / Objection banks</li><li>Add external: ad library + Reddit</li><li>Output: prioritized angle bank</li></ul></div>
+    <div class="ph p3"><div class="pn">Phase 3</div><div class="ph-h">Decision + doctrine</div>
+      <ul><li>Ingest ad performance (Meta + Supabase)</li><li>Codify WHEN→MESSAGE→RESULT→CONFIDENCE</li><li>Briefs auto-pull doctrine</li><li>Output: the doctrine ledger</li></ul></div>
+    <div class="ph p4"><div class="pn">Phase 4</div><div class="ph-h">Compounding</div>
+      <ul><li>Weekly synthesis on a cron</li><li>Semantic search over full corpus</li><li>Closed loop: results rewrite doctrine</li><li>Output: a moat that widens weekly</li></ul></div>
+  </div>
+
+  <!-- STANDARD -->
+  <div class="takeaway" id="standard">
+    <h2>The standard it's built to hit</h2>
+    <p>Most teams build <b>dashboards</b> — they report what happened. You're building toward <b>doctrine</b> — reusable, high-confidence rules that make the next bet smarter. The bot is working when it can produce a line like this on its own, from your real data:</p>
+    <div class="doctrine">WHEN: corporate women 30–45, failed side hustle &nbsp;·&nbsp; MESSAGE: identity liberation over money claims &nbsp;·&nbsp; RESULT: +40% application rate &nbsp;·&nbsp; CONFIDENCE: 8/10</div>
+    <p style="margin-top:14px">That sentence is worth more than any dashboard. A year of them is something a competitor cannot copy.</p>
+  </div>
+
+  <div class="foot">Marketing intelligence research bot · build blueprint v1.0 · grounded in your operating-model doc + the tools already live (Fathom, GHL, ICP Brain, sales-intelligence + icp-research skills). The bot productizes and unifies what those skills already do, then adds the memory + decision layers that make it compound.</div>
+
+</div>
+
+<script>
+  const KEY="mibot_chk_v1";
+  const state=JSON.parse(localStorage.getItem(KEY)||"{}");
+  document.querySelectorAll(".ci[data-id]").forEach(el=>{
+    const id=el.dataset.id;
+    if(state[id]) el.classList.add("done");
+    el.addEventListener("click",()=>{
+      el.classList.toggle("done");
+      state[id]=el.classList.contains("done");
+      localStorage.setItem(KEY,JSON.stringify(state));
+    });
+  });
+</script>
+</body>
+</html>
